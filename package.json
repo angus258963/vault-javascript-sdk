@@ -1,0 +1,32 @@
+{
+  "name": "mith-vault-sdk",
+  "version": "1.0.0",
+  "description": "This open-source library allows you to integrate VAULT into your app.",
+  "main": "src/index.js",
+  "scripts": {
+    "build": "rollup -c"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mithio/vault-oauth-js.git"
+  },
+  "author": "Scott Wang",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/mithio/vault-oauth-js/issues"
+  },
+  "homepage": "https://github.com/mithio/vault-oauth-js#readme",
+  "dependencies": {
+    "axios": "^0.18.0",
+    "crypto-js": "^3.1.9-1"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.3.3",
+    "@babel/preset-env": "^7.3.1",
+    "eslint": "^5.14.1",
+    "rollup": "^1.2.2",
+    "rollup-plugin-babel": "^4.3.2",
+    "rollup-plugin-eslint": "^5.0.0",
+    "rollup-plugin-uglify": "^6.0.2"
+  }
+}
