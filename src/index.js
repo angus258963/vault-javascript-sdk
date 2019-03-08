@@ -1,21 +1,20 @@
-import CryptoJS from 'crypto-js'
-import axios from 'axios'
+import { _uuid, _randomInt, _sendAPI } from './utils'
 
 class MithVaultSDK {
-  constructor(clientId, clientSecert, miningKey) {
+  constructor({ clientId, clientSecret, miningKey } = {}) {
     this.host = 'https://2019-hackathon.mithvault.io'
     this.api = 'https://2019-hackathon.api.mithvault.io'
     this.authorize = '/#/oauth/authorize'
     this.donate = '/#/donate'
     this.clientId = clientId
-    this.clientSecert = clientSecert
+    this.clientSecert = clientSecret
     this.miningKey = miningKey
   }
 
-  getBindURI(state = null) {
+  getBindURI(state = _uuid()) {
     const payload = {
       client_id: this.clientId,
-      state: state || _uuid()
+      state: state
     }
     const query = Object.keys(payload)
       .map(key => `${key}=${payload[key]}`)
@@ -24,7 +23,7 @@ class MithVaultSDK {
     return url
   }
 
-  getDonateURI(appID, userID, amount, state, description) {
+  getDonateURI({ appID, userID, amount, state, description } = {}) {
     const payload = {
       app_id: appID,
       user_id: userID,
@@ -35,11 +34,11 @@ class MithVaultSDK {
     const query = Object.keys(payload)
       .map(key => `${key}=${payload[key]}`)
       .join('&')
-    const url = `${this.host}${this.donate}?${query}`
-    return url
+
+    return `${this.host}${this.donate}?${query}`
   }
 
-  getAccessToken(grantCode, state) {
+  getAccessToken({ grantCode, state } = {}) {
     const payload = {
       client_id: this.clientId,
       timestamp: Math.floor(Date.now() / 1000),
@@ -53,7 +52,7 @@ class MithVaultSDK {
     return response
   }
 
-  delUnbindToken(token) {
+  delUnbindToken({ token } = {}) {
     const payload = {
       client_id: this.clientId,
       timestamp: Math.floor(Date.now() / 1000),
@@ -98,7 +97,7 @@ class MithVaultSDK {
     return response
   }
 
-  getUserMiningAction(token, nextId = null) {
+  getUserMiningAction({ token, nextId = null } = {}) {
     const payload = {
       client_id: this.clientId,
       timestamp: Math.floor(Date.now() / 1000),
@@ -121,7 +120,12 @@ class MithVaultSDK {
     return response
   }
 
-  postUserMiningAction(token, uuid = null, reward = 1, happenedAt = null) {
+  postUserMiningAction({
+    token,
+    uuid = _uuid(),
+    reward = 1,
+    happenedAt = null
+  } = {}) {
     const now = new Date()
     const dtp = number => number.toString().padStart(2, 0)
     const payload = {
@@ -129,7 +133,7 @@ class MithVaultSDK {
       timestamp: Math.floor(Date.now() / 1000),
       nonce: _randomInt(),
       mining_key: this.miningKey,
-      uuid: uuid || _uuid(),
+      uuid: uuid,
       reward,
       happened_at:
         happenedAt ||
@@ -151,7 +155,7 @@ class MithVaultSDK {
     return response
   }
 
-  deleteUserMiningAction(token, uuid) {
+  deleteUserMiningAction({ token, uuid } = {}) {
     const payload = {
       client_id: this.clientId,
       timestamp: Math.floor(Date.now() / 1000),
@@ -173,78 +177,3 @@ class MithVaultSDK {
 }
 
 export default MithVaultSDK
-
-function _uuid() {
-  var d = Date.now()
-  if (
-    typeof performance !== 'undefined' &&
-    typeof performance.now === 'function'
-  ) {
-    d += performance.now() //use high-precision timer if available
-  }
-  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
-    var r = (d + Math.random() * 16) % 16 | 0
-    d = Math.floor(d / 16)
-    return (c === 'x' ? r : (r & 0x3) | 0x8).toString(16)
-  })
-}
-
-function _sendAPI(
-  endpoint,
-  method = 'GET',
-  options = { headers: null, data: null, params: null }
-) {
-  const payload = options.params || options.data || {}
-  const headers = options.headers || {}
-
-  if ('client_id' in payload) {
-    const signature = _generateSignature(
-      payload,
-      CryptoJS.enc.Hex.parse(this.clientSecert)
-    )
-    headers['X-Vault-Signature'] = signature
-  }
-
-  const url = `${this.api}/${endpoint}`
-  try {
-    return axios({
-      method,
-      url,
-      params: options.params,
-      data: options.data,
-      headers
-    })
-      .then(response => response.data)
-      .catch(error => {
-        throw error
-      })
-  } catch (e) {
-    throw e
-  }
-}
-
-function _generateSignature(data, secret) {
-  let query = ''
-  if (data && Array.isArray(data)) {
-    query = data.join(',')
-  } else if (data) {
-    const sortedData = _sortObject(data)
-    query = Object.keys(sortedData)
-      .map(key => `${key}=${sortedData[key]}`)
-      .join('&')
-  } else if (data) {
-    query = data.toString()
-  }
-  const signature = CryptoJS.HmacSHA512(query, secret)
-  return CryptoJS.enc.Hex.stringify(signature)
-}
-
-function _sortObject(o) {
-  return Object.keys(o)
-    .sort()
-    .reduce((r, k) => ((r[k] = o[k]), r), {})
-}
-
-function _randomInt() {
-  return Math.floor(Math.random() * 1e17)
-}

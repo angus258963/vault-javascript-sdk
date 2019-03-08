@@ -22,31 +22,14 @@ In a browser:
 <script src="mith-vault-sdk.min.js"></script>
 ```
 
-or
-
-```html
-// Add dependency packages
-<script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.9-1/crypto-js.min.js"></script>
-<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
-
-// Mithril VAULT SDK
-<script src="mith-vault-sdk.browser.js"></script>
-```
-
 In Node.js
 
 - Install dependency packages [axio](https://github.com/axios/axios) and [crypto-js](https://github.com/brix/crypto-js)
 
-- import MithVaultSDK into your project
+- Import MithVaultSDK into your project
 
 ```js
 const MithVaultSDK = require('mith-vault-sdk.min.js')
-```
-
-or
-
-```js
-const MithVaultSDK = require('mith-vault-sdk.node.min.js')
 ```
 
 ## USAGE
@@ -54,24 +37,17 @@ const MithVaultSDK = require('mith-vault-sdk.node.min.js')
 With your application CLIENT ID, CLIENT KEY and MINING KEY, create a MithVaultSDK instance and your application can execute VAULT API. For example
 
 ```js
-const clientID = 'ba6cabfb4de8d9f4f388124b1afe82b1'
+const clientId = 'ba6cabfb4de8d9f4f388124b1afe82b1'
 const clientSecret = 'aefd2b59d780eb29bc95b6cf8f3503233ad702141b20f53c8a645afbb8c6616048c5e9cc741e0ebee1a2469c68364e57e29dbeeabadc0b67958b9c3da7eabab9'
 const miningKey = 'demo'
-const authorization = '1668ff50dca1a85086b558e9e5abc521f14f2317712cb7725d8a9b0f670afe04ea61e091f1060e7845e16e55e300995cb79340782ce34ba683ec9e37e856ff95'
+const userToken = '1668ff50dca1a85086b558e9e5abc521f14f2317712cb7725d8a9b0f670afe04ea61e091f1060e7845e16e55e300995cb79340782ce34ba683ec9e37e856ff95'
 
-const sdk = new MithVaultSDK(clientID, clientSecret, miningKey)
-sdk.getUserMiningAction(authorization).then(data => {
+const sdk = new MithVaultSDK({ clientID, clientSecret, miningKey })
+sdk.getUserMiningAction({ token: userToken }).then(data => {
   ...
 }).catch(error => {
   ...
 })
-
-try {
-  const data = await sdk.getUserMiningAction(authorization)
-  ...
-} catch (error) {
-  ...
-}
 ```
 
 ## GIVE FEEDBACK
